@@ -1,0 +1,56 @@
+#!/usr/env/python
+from Tkinter import *
+import ttk
+
+root = Tk()
+
+mainframe = ttk.Frame(root, padding="3 3 12 12")
+mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+mainframe.columnconfigure(0, weight=1)
+mainframe.rowconfigure(0, weight=1)
+
+wordFrame = ttk.Frame(mainframe)
+wordFrame.grid(column=2, row=2)
+
+canvas = Canvas(mainframe)
+word = "hello"
+c1 = 0
+f = 10
+d = 0
+for letter in word:
+	c1+=1
+	f+=10
+	d += 10
+	print (letter)
+	canvas.create_line(100, 0, 200, 0)
+
+def btnFunc(x):
+	print (x)
+	word = "HELLO"
+	if x in word:	
+		print "Yessss"
+		quit()
+	else:
+		canvas.create_line(300, 200, 150, 200)
+
+frame = ttk.Frame(mainframe)
+frame.grid(row=3, column=1, sticky=(S,W,E))
+btnList = [
+'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ]
+
+c = 0
+r = 1
+i = 0
+for btn in btnList:
+	i+=1
+	c+=1
+	if c > 13:
+		r+=1
+		c = 1
+	cmd = lambda x=btn: btnFunc(x)	
+	ttk.Button(frame, text=btn, width = 3, command=cmd).grid(column=c, row=r)
+#canvas = Canvas(mainframe)
+canvas.grid(column=1, row=1, sticky=(N,W,S,E))
+
+root.mainloop()
