@@ -1,0 +1,312 @@
+from tkinter import *    
+from os import listdir   
+import os
+from tkinter.filedialog import *
+
+from tkinter import ttk
+
+root = Tk()
+root.title=("Recipe Entererer")
+
+mainframe = ttk.Frame(root, padding="8 8 10 10")
+mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+mainframe.columnconfigure(0, weight=1)
+mainframe.rowconfigure(0, weight=1)
+
+def radioButtonLoop(): 
+	if radioButtonVariable.get() == "newRecipe":
+		recipeNumberOfPeople()
+	elif radioButtonVariable.get() == "viewRecipe":
+		recipeEdit()
+	else:
+		root.destroy()
+	
+
+def recipeNumberOfPeople():
+	for child in mainframe.winfo_children(): child.grid_forget()
+
+
+	global actualRecipeTitle
+	global actualIngredients
+	global ingredientsNumber
+	global numberOfPeopleServed
+	global numberOfPeopleLabel
+	global numberOfPeopleEntry
+	global numberOfPeopleButton
+	
+	actualRecipeTitle = StringVar()
+	actualIngredients = StringVar()    
+	ingredientsNumber = StringVar()
+	numberOfPeopleServed = StringVar()
+
+
+	numberOfPeopleLabel = ttk.Label(mainframe, text="How many people will this recipe serve?")
+	numberOfPeopleEntry = ttk.Entry(mainframe, textvariable=numberOfPeopleServed, width=7)
+	#numberOfPeopleLabel2 = ttk.Label(mainframe, textvariable=numberOfPeopleServed, width=9)
+	numberOfPeopleButton = ttk.Button(mainframe, text="Next", command=numberOfPeopleKilled)
+	
+	numberOfPeopleLabel.grid(column=2, row=1, sticky=(E, W))
+	numberOfPeopleEntry.grid(column=2, row=2, sticky=(E, W))
+	#numberOfPeopleLabel2.grid(column=5, row=8, sticky=N)
+	numberOfPeopleButton.grid(column=3, row=4, sticky=E)
+
+def numberOfPeopleKilled():
+	for child in mainframe.winfo_children(): child.grid_forget()
+
+	ingredientsFunction()
+
+
+
+def ingredientsFunction():
+	global ingredientsLabel
+	global ingredientsButton
+	global ingredientsEntry
+	global ingredientsNumber
+	ingredientsLabel = ttk.Label(mainframe, text="How many ingredients will you be inputting?")
+	ingredientsEntry = ttk.Entry(mainframe, textvariable=ingredientsNumber)
+	ingredientsButton = ttk.Button(mainframe, text="Next", command=ingredientsKilled)
+
+	ingredientsLabel.grid(column=2, row=1, sticky=(W, E))
+	ingredientsEntry.grid(column=2,row=2, sticky=(W, E))
+	ingredientsButton.grid(column=3, row=4, sticky=E)
+
+def ingredientsKilled():
+	for child in mainframe.winfo_children(): child.grid_remove()
+
+	global actualRecipeListLabel
+	global textBox
+	global actualRecipeNameEntry
+	global actualRecipeNameLabel
+	
+	global actualIngredientsInsertButton
+	global actualRecipeListLabelInstructions
+	actualRecipeNameLabel = ttk.Label(mainframe, text="What will this recipe be called?")
+	actualRecipeNameEntry = ttk.Entry(mainframe, textvariable=actualRecipeTitle)
+	actualRecipeListLabel = ttk.Label (mainframe, text="Ingredients\tQuantity")
+	actualRecipeListLabelInstructions = ttk.Label(mainframe, text="Enter your ingredient, press TAB, \nthen enter the Quantity followed by the Units.\n Enter each new ingredient and Quantity\n on a new line\nFor Example:\n Flour  200g" )
+	x23=int(ingredientsNumber.get())
+	textBox = Text(mainframe, width=30, height=x23)
+	
+	#actualIngredientsEntry = Listbox(mainframe)
+	actualIngredientsInsertButton = ttk.Button(mainframe, text="Done", command=actualIngredientInserted)
+	actualRecipeListLabelInstructions.grid(column=3, row=6, sticky=(N, W))
+	
+	textBox.grid(column=1, row=6, sticky=(W, E))
+	actualRecipeListLabel.grid(column=1, row=5, sticky=(W, E))
+	actualIngredientsInsertButton.grid(column=3, row=7, sticky=E)
+	actualRecipeNameEntry.grid(column=1, row=2, sticky=(E, W))
+	actualRecipeNameLabel.grid(column=1, row=1, sticky=(E, W))
+	#actualIngredientsEntry.grid(column=1, row=5, sticky=(N,E,S,W))
+	
+	#actualIngredientsEntry.insert(END, actualIngredients.get())
+def actualIngredientInserted():
+	global actualRecipeTitle1
+	actualRecipeTitle1 = actualRecipeTitle.get()
+	actualRecipeTitle2 = actualRecipeTitle1 + ".txt"
+	numberOfPeopleServed2 = str(numberOfPeopleServed.get())
+	ingredients = str(textBox.get('1.0', 'end'))
+	print ("titles","%s %s" % (actualRecipeTitle2, actualRecipeTitle))
+	actualRecipeFile = pythonDirectory
+	actualRecipeFile += "\\"
+	actualRecipeFile += actualRecipeTitle2
+	file = open(actualRecipeFile, "w")
+	file.write(ingredients)
+	file.write("\nThis Recipe serves "+numberOfPeopleServed.get()+" people")
+	file.write("\nThis Recipe has "+str(ingredientsNumber.get())+" ingredients")
+	file.close()
+	
+	homeScreen()
+
+
+def homeScreen():
+	for child in mainframe.winfo_children(): child.grid_forget()
+
+	global h
+	h = 0
+	global homeScreenLabel
+	global homeScreenRadioButton1
+	global homeScreenRadioButton2 
+	global homeScreenRadioButton3
+	global radioButtonVariable
+	global homeScreenButton
+	global pythonDirectory
+	pythonDirectory = os.path.dirname(os.path.realpath(__file__))
+	pythonDirectory += "\\recipes\\"
+	radioButtonVariable = StringVar()
+	homeScreenLabel  = ttk.Label(mainframe, text="What do you want to do?")
+	homeScreenRadioButton1 = ttk.Radiobutton(mainframe, text="Add a new recipe", variable=radioButtonVariable, value="newRecipe")
+	homeScreenRadioButton2 = ttk.Radiobutton(mainframe, text="View and modify recipe", variable=radioButtonVariable, value="viewRecipe")
+	homeScreenRadioButton3 = ttk.Radiobutton(mainframe, text="Exit", variable=radioButtonVariable, value="exit")
+
+	homeScreenButton = ttk.Button(mainframe, text="Done", command=radioButtonLoop)
+
+	homeScreenButton.grid(column=3, row=6, sticky=E)
+	homeScreenLabel.grid(column=1, row=1, sticky=(W, E))
+	homeScreenRadioButton1.grid(column=1, row=3, sticky=W)
+	homeScreenRadioButton2.grid(column=1, row=4, sticky=W)
+	homeScreenRadioButton3.grid(column=1, row=5, sticky=W)
+	
+						
+def ingredientsList():
+	pass
+def recipeEdit():
+	
+	for child in mainframe.winfo_children(): child.grid_forget()
+	global pythonDirectory
+	global pythonFiles
+	global fileName
+	global whatNextLabel
+	global whatNextButton1
+	global whatNextButton2
+	pythonDirectory = os.path.dirname(os.path.realpath(__file__))
+	pythonDirectory += "\\recipes\\"
+	pythonFiles = listdir(pythonDirectory)
+	print ("%s %s " % (pythonDirectory,pythonFiles))
+
+	fileName = askopenfile(mode="r", title="Choose recipe", filetypes=[("Recipe Files",".txt")])
+	
+	whatNextLabel = ttk.Label(mainframe, text="What now?")
+	whatNextButton1 = ttk.Button(mainframe, text="View Recipe", command=viewRecipe)
+	whatNextButton2 = ttk.Button(mainframe, text="Change recipe for more/less people", command=peopleChange)
+
+	print (fileName.name)
+	whatNextLabel.grid(column=1, row=1, sticky=(W, E))
+	whatNextButton1.grid(column=1, row=3, sticky=W)
+	whatNextButton2.grid(column=1, row=4, sticky=W)
+def homeScreenExit():
+	root.destroy()
+	
+def viewRecipe():
+	for child in mainframe.winfo_children(): child.grid_forget()
+	#print (newFileName, fileName.name)
+	global recipeText
+	global goHomeButton
+	recipeText = Text(mainframe)
+	fileToView = fileName.name
+	f=open(fileToView, 'r')
+	recipeText.insert(END, open(fileToView).read())
+	
+	
+	goHomeButton = ttk.Button(mainframe, text="Back", command=recipeEdit)
+	recipeText.grid(column=1, row=1, sticky=E)
+	goHomeButton.grid(column=1, row=3, sticky=W)
+
+def recipeToHomeScreen():
+	for child in mainframe.winfo_children(): child.grid_forget()
+
+	homeScreen()
+def peopleChange():
+	for child in mainframe.winfo_children(): child.grid_forget()
+	global originalNumber
+	global newNumber
+	global ingNumber
+	f = open(fileName.name)
+	i = 0
+	
+	print ("file name",f.name)
+	lines=f.readlines()
+	while True:
+		if "Recipe" in lines[i]:
+			
+			originalNumber = (lines[i])
+			s = 2
+			print ("Orig Num, i ",originalNumber, i)
+			
+			break
+		i=i+1
+		
+	
+	i = 0
+	try:
+		
+		while i != 10:
+			print ("Cound i:",i)
+			if "ingredients" in lines[i]:
+			   ingNumber = (lines[i])
+			   print ("Ingredient No",ingNumber)
+			i=i+1
+			print (i)
+	except IndexError:
+		pass
+		
+	newNumber=StringVar()
+	originalNumberVar = originalNumber
+	print (originalNumberVar)
+	peopleChangeLabel = ttk.Label(mainframe, text="%s\nHow many people do\nyou want to recalculate this recipe for?" % originalNumber)
+	peopleChangeEntry = ttk.Entry(mainframe, textvariable=newNumber)
+	peopleChangeButton = ttk.Button(mainframe, text="Next", command=changePeopleServed)
+	
+	
+	peopleChangeLabel.grid(column=1, row=1, sticky=(E,W))
+	peopleChangeEntry.grid(column=1, row=3, sticky=(E,W))
+	peopleChangeButton.grid(column=2, row=5, sticky=(E))
+
+def changePeopleServed():
+	for child in mainframe.winfo_children(): child.grid_forget()
+	#print (originalNumber[15,16])
+	#global newFileName
+	p = originalNumber.split('serves ',1)
+	q = p[1].split('people',1)
+	print (q[1])
+	originalNumber1 = q
+	divideBy=originalNumber1[0] # string
+	actualFileName = fileName.name
+	f1 = open(actualFileName, 'r')
+	newFileName = fileName.name
+	newSplit = newFileName.split(".", 1)
+	newFileName = newSplit[0] + "New" + ".txt"
+	#fileName = newFileName
+	
+	f2 = open(newFileName, 'w')
+	r = int(originalNumber1[0])
+	k = int(newNumber.get())
+	print ("original Number ",r)
+	print ("New Number:",k)
+	
+	j = r/k
+	print ("int J",int(j))
+	#s = int(int(newNumber.get())/int(divideBy))
+	#print ("here",s)
+	#s = int(int(originalNumber1[0])/int(newNumber.get()))
+	#s = int(originalNumber1/newNumber.get())
+	
+	#print (s)
+	lines=f1.readlines()
+	g = 0
+	print ("ingnumer", ingNumber)
+	split1 = ingNumber.split("has", 1)
+	split2 = split1[1].split("ingredients", 1)
+	ingredientsNumber = split2[0]
+	print (type(ingredientsNumber))
+	print ("ing Humer",ingredientsNumber)
+	#print (originalNumber1[0])
+	#numberOfLines = int(originalNumber + 1)
+	i = 0
+	while i != 5:
+		print (i, "Line", lines[i])
+		i += 1
+	f2.close()
+	f1.close()
+	viewRecipeAgain()
+def viewRecipeAgain():
+	for child in mainframe.winfo_children(): child.grid_forget()
+	global recipeText
+	global goHomeButton
+	recipeText = Text(mainframe)
+	
+	print ("HEYYY",fileName)
+	newFileName = fileName.name
+	newSplit = str(newFileName).split(".txt", 1)
+	#print ("\n\nhey",newSplit[0])
+	newFileName = newSplit[0] + "New" + ".txt" + newSplit[1]
+	print ("oi",newFileName.lstrip(), newFileName)
+	#f=open(fileName.name, 'r')
+	recipeText.insert(END, open(newFileName).read())
+	
+		
+	goHomeButton = ttk.Button(mainframe, text="Back", command=recipeEdit)
+	recipeText.grid(column=1, row=1, sticky=E)
+	goHomeButton.grid(column=1, row=3, sticky=W)
+	
+homeScreen()                             
+root.mainloop()
