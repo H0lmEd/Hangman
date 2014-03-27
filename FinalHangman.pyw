@@ -3,14 +3,19 @@ from random import randrange
 import re
 from tkinter import ttk
 
-words = ["defrosted"]
+words = open("words.txt")
+singleWords = words.readlines()
 
-lives = 6
+
+lives = 10
 root = Tk()
 mainframe = ttk.Frame(root, padding="3 3 12 12")
 mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
 mainframe.columnconfigure(0, weight=1)
 mainframe.rowconfigure(0, weight=1)
+
+
+
 
 class Application(Frame):
                 
@@ -22,7 +27,7 @@ class Application(Frame):
                 self.showingLtr = {}
                 self.ltrVar = {}
                 self.lives = StringVar()
-                self.lives.set("6")
+                self.lives.set("10")
                 self.wordFrame = ttk.Frame(mainframe)
                 self.amountEntered = 0
                 self.enteredLetters = []
@@ -39,17 +44,19 @@ class Application(Frame):
                 ttk.Button(mainframe, text="Add Word", command=self.addWord).grid(column=2, row=1, sticky=E)
         
         def addWord(self):
-                i = len(words)+1
+                i = len(singleWords)+1
                 inputWord = self.inputtedWord.get()
-                if inputWord not in words:
-                        words.append(inputWord)
+                if inputWord not in singleWords:
+                        pass
                 for child in mainframe.winfo_children(): child.grid_forget()
                 self.startPage()
         def play(self):
                 for child in mainframe.winfo_children(): child.grid_forget()
-                i = randrange(0,len(words))
+                
+                i = int(randrange(0,len(singleWords)))
                 global word
-                word = words[i]
+                b = len(singleWords[i])
+                word = singleWords[i].replace("\n", "")
                 Leta = StringVar()
                 self.canvas.grid(column=3, row=1, sticky=(N, W, E, S))
                 self.wordFrame.grid(column=3, row=2)
@@ -76,57 +83,68 @@ class Application(Frame):
         def letterEntered(self,count):
                 
                 self.checkLetter()
-        
         def checkLetter(self):
                 self.letter = self.Leta.get().lower()
                 
                 self.amountEntered +=1
+                def topButton(count):
+                        top.destroy()
                 global lives
                 self.letterEntry.delete(0, END)
                 if not re.match("^[a-z]*$", self.letter):
                         top = Toplevel()
                         top.title("Alert")
                         ttk.Label(top, text="Please enter letters only").grid(column=1, row=1)
-                        ttk.Button(top, text="Dismiss", command=top.destroy).grid(column=2,row=2)
+                        closeButton = ttk.Button(top, text="Dismiss", command=top.destroy)
+                        closeButton.grid(column=2, row=2)
+                        top.bind('<Return>', topButton)
                         top.focus()
                 elif len(self.letter) > 1:
                         top = Toplevel()
                         top.title("Alert")
                         ttk.Label(top, text="Only enter one letter at a time!").grid(column=1, row=1)
-                        ttk.Button(top, text="Dismiss", command=top.destroy).grid(column=2,row=2)
+                        closeButton = ttk.Button(top, text="Dismiss", command=top.destroy)
+                        closeButton.grid(column=2, row=2)
+                        top.bind('<Return>', topButton)
                         top.focus()
                 elif self.letter in self.enteredLetters:
                         top = Toplevel()
                         top.title("Alert")
                         ttk.Label(top, text="Letter already entered! Please enter another").grid(column=1, row=1)
-                        ttk.Button(top, text="Dismiss", command=top.destroy).grid(column=2,row=2)
+                        closeButton = ttk.Button(top, text="Dismiss", command=top.destroy)
+                        closeButton.grid(column=2, row=2)
+                        top.bind('<Return>', topButton)
                         top.focus()
                 elif self.letter not in self.enteredLetters:
                         self.enteredLetters.extend(self.letter)
                         
+                        
                         if self.letter.lower() not in word.lower():
                                 lives -= 1
                                 self.lives.set(lives)
-                                if lives == 5:
+                                if lives == 9:
                                         self.canvas.create_line(300, 200, 150, 200)
-                                        self.canvas.create_line(150, 200, 150, 50)
-                                if lives == 4:
+                                if lives == 8:
+                                         self.canvas.create_line(150, 200, 150, 50)
+                                if lives == 7:
                                         self.canvas.create_line(250, 50, 150, 50)
+                                if lives == 6:
                                         self.canvas.create_line(170, 50, 150, 70)
-                                if lives == 3:
+                                if lives == 5:
                                         self.canvas.create_line(250, 50, 250, 65)
+                                if lives == 4:        
                                         self.canvas.create_oval(235, 65, 265, 95)
-                                if lives == 2:
+                                if lives == 3:
                                         self.canvas.create_line(250, 95, 250, 145)
-                                if lives == 1:                                        
+                                if lives == 2:                                        
                                         self.canvas.create_line(250, 145, 265, 170)
-
+                                if lives == 1:
                                         self.canvas.create_line(250, 145, 235, 170)
                                 if lives == 0:
                                         self.canvas.create_line(230, 115, 270, 115)
                                         top = Toplevel()
                                         top.title("Alert")
-                                        ttk.Label(top, text="Game Over!").grid(column=1, row=1)
+                                        ttk.Label(top, text="Game Over! The word was: \n%s" % word.lower()).grid(column=1, row=1, sticky=(E, W))
                                         ttk.Button(top, text="Ok", command=root.destroy).grid(column=2,row=2)
                                         top.focus()
                                 
